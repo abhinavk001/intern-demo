@@ -9,3 +9,7 @@ Demo of fastAPI
 - Install dependencies. `pip install -r requirements.txt`
 - Run. `uvicorn main:app --reload`
 - Visit http://127.0.0.1:8000/docs#/ for API documentation.
+
+### Testing
+- cd into the project folder.
+- Run `pytest`
