@@ -1,8 +1,8 @@
 """
 Entrypoint
 """
-from fastapi import FastAPI, Depends, status, HTTPException
 from typing import Optional
+from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -16,12 +16,14 @@ app = FastAPI()
 
 models.Base.metadata.create_all(set_up_database())
 
+
 @app.get("/")
 def home():
     """
     Homepage
     """
     return {"greetings":"hello"}
+
 
 @app.get("/api/users")
 def get_users(page: int = 1, limit: int = 5, name:Optional[str] = None, sort:Optional[str] = None, db: Session = Depends(get_db)):
@@ -39,6 +41,7 @@ def get_users(page: int = 1, limit: int = 5, name:Optional[str] = None, sort:Opt
 
     return users
 
+
 @app.post("/api/users", status_code=status.HTTP_201_CREATED)
 def create_user(request:CreateUser, db: Session = Depends(get_db)):
     """
@@ -48,8 +51,9 @@ def create_user(request:CreateUser, db: Session = Depends(get_db)):
     try:
         commit_changes_to_object(db, new_request)
     except IntegrityError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"User already exists")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
     return {"message":"User created successfully"}
+
 
 @app.get("/api/users/{id}", status_code=status.HTTP_200_OK)
 def get_user_by_id(id: int, db: Session = Depends(get_db)):
@@ -59,10 +63,11 @@ def get_user_by_id(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     return user
-    
+
+
 @app.patch("/api/users/{id}", status_code=status.HTTP_200_OK)
 def update_user(id: int, request:UpdateUser, db: Session = Depends(get_db)):
     """
@@ -70,7 +75,7 @@ def update_user(id: int, request:UpdateUser, db: Session = Depends(get_db)):
     """
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     for key, value in request.dict().items():
         if value:
@@ -79,6 +84,7 @@ def update_user(id: int, request:UpdateUser, db: Session = Depends(get_db)):
     commit_changes_to_object(db, user)
     return {"message":"User updated successfully"}
 
+
 @app.delete("/api/users/{id}", status_code=status.HTTP_200_OK)
 def delete_user(id: int, db: Session = Depends(get_db)):
     """
@@ -86,7 +92,7 @@ def delete_user(id: int, db: Session = Depends(get_db)):
     """
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     db.delete(user)
     db.commit()

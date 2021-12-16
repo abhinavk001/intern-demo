@@ -2,13 +2,10 @@
 Common utilities for database operations
 """
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.functions import mode
 from database.config_db import Base, SessionLocal
 from database import models
 
-"""
-Select columns to sort based on query parameters
-"""
+
 columns = {
     "id":models.User.id,
     "first_name":models.User.first_name,
@@ -41,7 +38,7 @@ def get_db():
         yield db
     finally:
         db.close()
-    
+
 def commit_changes_to_object(database: Session, obj: Base):
     """
     Finish the database transaction and refresh session
